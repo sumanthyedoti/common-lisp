@@ -1,0 +1,2 @@
+
+((:TITLE "abc" :ARTIST "tr" :RATING 6 :RIPPED? T) (:TITLE "gfdj" :ARTIST "rr" :RATING 7 :RIPPED? NIL) (:TITLE "abc" :ARTIST "ff" :RATING 4 :RIPPED? T)) 
