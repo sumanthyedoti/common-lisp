@@ -20,7 +20,9 @@
   (setf *lower_limit* (1+ *guess*))
   (guess-again))
 
+
 (defun start-over ()
   (setf *lower_limit* 1)
   (setf *upper_limit* 100)
   (setf *guess* (random-in-range *lower_limit* *upper_limit*)))
+

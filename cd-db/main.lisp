@@ -1,4 +1,5 @@
-(defvar *db* ())
+(defvar *db* nil)
+(defvar *DB_FILE_NAME* "./cds.db")
 
 (defun make-cd (title artist rating ripped?)
   (list :title title :artist artist :rating rating :ripped? ripped?))
@@ -24,4 +25,24 @@
 
 (defun add-cds ()
   (loop (add-record (prompt-for-cd))
-  (if (not (y-or-n-p "Another? [y/n]: ")) (return))))
+        (if (not (y-or-n-p "Another? [y/n]: ")) (return)))
+  (save-db)
+  (format t "~%DB Saved in ./cds.db"))
+
+
+(defun save-db (&optional (filename *DB_FILE_NAME*))
+  (with-open-file (out_file filename
+                       :direction :output
+                       :if-exists :supersede)
+    (with-standard-io-syntax
+      (print *db* out_file))))
+
+(defun load-db (&optional (filename *DB_FILE_NAME*))
+  (with-open-file (in_file filename)
+    (with-standard-io-syntax
+      (setf *db* (read in_file)))))
+
+(defun delete-db ()
+  (setf *db* nil)
+  (save-db))
+
