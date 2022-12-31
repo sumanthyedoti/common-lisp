@@ -27,8 +27,7 @@
   (loop (add-record (prompt-for-cd))
         (if (not (y-or-n-p "Another? [y/n]: ")) (return)))
   (save-db)
-  (format t "~%DB Saved in ~a", *db_file_name*))
-
+  (format t "~%DB Saved in ~a" *db_file_name*))
 
 (defun save-db (&optional (filename *db_file_name*))
   (with-open-file (out_file filename
@@ -46,18 +45,10 @@
   (setf *db* nil)
   (save-db))
 
-(defun select (selector-fn)
+(defun select-records (selector-fn)
   (remove-if-not selector-fn *db*))
 
-(defun where (&key title artist rating (ripped? nil ripped?-p))
-  #'(lambda (cd)
-      (and
-        (if title (equal (getf cd :title) title) t)
-        (if artist (equal (getf cd :artist) title) t)
-        (if rating (equal (getf cd :rating) rating) t)
-        (if ripped?-p (equal (getf cd :ripped?) ripped?) t))))
-
-(defun update (selector-fn &key title artist rating (ripped? nil ripped?-p))
+(defun update-records (selector-fn &key title artist rating (ripped? nil ripped?-p))
   (setf *db* (mapcar #'(lambda (row)
                          (when (funcall selector-fn row)
                            (if title (setf (getf row :title) title))
@@ -67,7 +58,13 @@
                          row) *db*))
   (save-db))
 
+(defun delete-records (selector-fn)
+  (setf *db* (remove-if selector-fn *db*))
+  (save-db))
 
-
-
-
+(defmacro where (&rest clauses)
+  `#'(lambda (cd)
+       (and ,@(loop while clauses
+                collecting (let ((field (pop clauses))
+                                 (value (pop clauses)))
+                            `(equal (getf cd ,field) ,value))))))
