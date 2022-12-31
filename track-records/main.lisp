@@ -1,5 +1,5 @@
 (defvar *db* nil)
-(defvar *DB_FILE_NAME* "./cds.db")
+(defvar *db_file_name* "./cds.db")
 
 (defun make-cd (title artist rating ripped?)
   (list :title title :artist artist :rating rating :ripped? ripped?))
@@ -27,17 +27,17 @@
   (loop (add-record (prompt-for-cd))
         (if (not (y-or-n-p "Another? [y/n]: ")) (return)))
   (save-db)
-  (format t "~%DB Saved in ./cds.db"))
+  (format t "~%DB Saved in ~a", *db_file_name*))
 
 
-(defun save-db (&optional (filename *DB_FILE_NAME*))
+(defun save-db (&optional (filename *db_file_name*))
   (with-open-file (out_file filename
                        :direction :output
                        :if-exists :supersede)
     (with-standard-io-syntax
       (print *db* out_file))))
 
-(defun load-db (&optional (filename *DB_FILE_NAME*))
+(defun load-db (&optional (filename *db_file_name*))
   (with-open-file (in_file filename)
     (with-standard-io-syntax
       (setf *db* (read in_file)))))
@@ -56,3 +56,18 @@
         (if artist (equal (getf cd :artist) title) t)
         (if rating (equal (getf cd :rating) rating) t)
         (if ripped?-p (equal (getf cd :ripped?) ripped?) t))))
+
+(defun update (selector-fn &key title artist rating (ripped? nil ripped?-p))
+  (setf *db* (mapcar #'(lambda (row)
+                         (when (funcall selector-fn row)
+                           (if title (setf (getf row :title) title))
+                           (if artist (setf (getf row :artist) title))
+                           (if rating (setf (getf row :rating) rating))
+                           (if ripped?-p (setf (getf row :ripped?) ripped?)))
+                         row) *db*))
+  (save-db))
+
+
+
+
+
