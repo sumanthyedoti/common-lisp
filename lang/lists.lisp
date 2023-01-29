@@ -1,7 +1,9 @@
 ;;; lists
 ; lists are held together by cons cells
-; () === NIL
+; () == NIL == '() == 'nil
 (eq () NIL) ; T
+(eq '() NIL) ; T
+(eq () 'NIL) ; T
 
 ; list is a chain of cons cells
 (equal '(2 3 4) (cons 2 (cons 3 (cons 4 nil))))
